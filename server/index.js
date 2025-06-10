@@ -15,6 +15,11 @@ app.get('/api/hello', (req, res) => {
   res.json({ message: 'Hello from Express!' })
 });
 
+// start the conversation
+let conversationHistory = [
+  { role: 'system', content: 'You are a helpful assistant who only replies with Traditional Chinese.' },
+];
+
 app.post('/api/chat', async (req, res) => {
   try {
     const userMessage = req.body.message;
@@ -23,14 +28,20 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: 'User message is required' });
     }
 
+    // add user conversation
+    conversationHistory.push({ role: 'user', content: userMessage });
+
     const chatCompletion = await openai.chat.completions.create({
-      messages: [{ role: 'user', content: userMessage },
-      { role: 'system', content: 'You are a helpful assistant who only replies with Traditional Chinese.' },
-      ],
-      model: 'gpt-3.5-turbo',
+      messages: conversationHistory,
+      model: 'gpt-4o',
     });
 
-    res.json({ reply: chatCompletion.choices[0].message.content });
+    const assistantReply = chatCompletion.choices[0].message.content;
+
+    // add assistant conversation
+    conversationHistory.push({ role: 'assistant', content: assistantReply });
+
+    res.json({ reply: assistantReply });
 
   } catch (error) {
     console.error('OpenAI API Error:', error);
