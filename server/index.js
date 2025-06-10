@@ -27,6 +27,17 @@ let conversationHistory = [
   { role: 'system', content: systemPrompt },
 ];
 
+// customize response filter
+const filterResponse = (response) => {
+  const forbiddenKeywords = ["我", "妳", "你", "他", "她", "它"];
+
+  const replacedResponse = forbiddenKeywords.reduce((acc, keyword) => {
+    return acc.replaceAll(keyword, '*'.repeat(keyword.length));
+  }, response);
+
+  return replacedResponse;
+}
+
 app.post('/api/chat', async (req, res) => {
   try {
     const userMessage = req.body.message;
@@ -45,10 +56,12 @@ app.post('/api/chat', async (req, res) => {
 
     const assistantReply = chatCompletion.choices[0].message.content;
 
+    const filteredReply = filterResponse(assistantReply);
+
     // add assistant conversation
     conversationHistory.push({ role: 'assistant', content: assistantReply });
 
-    res.json({ reply: assistantReply });
+    res.json({ reply: filteredReply });
 
   } catch (error) {
     console.error('OpenAI API Error:', error);
