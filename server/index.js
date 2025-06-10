@@ -15,9 +15,16 @@ app.get('/api/hello', (req, res) => {
   res.json({ message: 'Hello from Express!' })
 });
 
+// add system prompt
+const systemPrompt = `You are a helpful assistant who only replies with Traditional Chinese.
+                      You can only reply within 50 words.
+                      You must check user's name before making any reply.
+                      You alway start your reply with "Hi, [user's name]".
+                      You can never talk about weather related topics`;
+
 // start the conversation
 let conversationHistory = [
-  { role: 'system', content: 'You are a helpful assistant who only replies with Traditional Chinese.' },
+  { role: 'system', content: systemPrompt },
 ];
 
 app.post('/api/chat', async (req, res) => {
