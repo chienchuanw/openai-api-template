@@ -24,7 +24,9 @@ app.post('/api/chat', async (req, res) => {
     }
 
     const chatCompletion = await openai.chat.completions.create({
-      messages: [{ role: 'user', content: userMessage }],
+      messages: [{ role: 'user', content: userMessage },
+      { role: 'system', content: 'You are a helpful assistant who only replies with Traditional Chinese.' },
+      ],
       model: 'gpt-3.5-turbo',
     });
 
